@@ -1,6 +1,6 @@
 ## Brown Dwarfs in Palatini gravity
 
-Code for calculating the evolution of the degeneracy parameter, i.e. $$\Psi$$, with respect to time in Palatini gravity (Starobinsky model).
+Code for calculating the evolution of the degeneracy parameter, i.e. $\Psi$, with respect to time in Palatini gravity (Starobinsky model).
 
 The evolution of the degeneracy parameter is given by equation (XX) in Benito & Wojnar 2021. The integration of this equation is done in C++ and the plotting of the corresponding results is done in python3.
 
