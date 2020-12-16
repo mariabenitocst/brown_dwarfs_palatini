@@ -5,14 +5,19 @@
 #include <cstdio>
 #include <iostream>
 #include <cmath>
-#include "Li2.hpp"
-#include "complex.hpp"
 #include <gsl/gsl_odeiv2.h>
 #include <limits>
 #include <cfloat>
 using namespace std;
 
-double Li2(double x) noexcept;
+#include <gsl/gsl_sf_dilog.h>
+
+double Li2(double x) {
+   gsl_sf_result li2_gsl{};
+   gsl_sf_dilog_e(x, &li2_gsl);
+   return li2_gsl.val;
+}
+
 
 /**
 // TODO check units of mu and mu_e!!
@@ -59,8 +64,7 @@ int func (double t,
 int main()
 {
 
-    double x = Li2(1.);
-    //cout << Li2(1.) << endl;
+    cout << Li2(0.25) << endl;
 
     // return 
     return 0;
