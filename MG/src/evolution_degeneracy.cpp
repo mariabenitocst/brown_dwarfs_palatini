@@ -6,15 +6,15 @@
 #include <iostream>
 #include <cmath>
 #include <gsl/gsl_odeiv2.h>
-#include <limits>
-#include <cfloat>
+#include <gsl/gsl_sf_dilog.h>
 using namespace std;
 
-#include <gsl/gsl_sf_dilog.h>
 
-double Li2(double x) {
+double Li2(double x) 
+{
    gsl_sf_result li2_gsl{};
    gsl_sf_dilog_e(x, &li2_gsl);
+   // return
    return li2_gsl.val;
 }
 
