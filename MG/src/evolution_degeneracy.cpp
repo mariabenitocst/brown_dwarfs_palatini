@@ -2,6 +2,7 @@
 // Calculate evolution of degeneracy parameter with time
 //
 // ====================================================================
+#include <sstream>
 #include <cstdio>
 #include <iostream>
 #include <cmath>
@@ -70,9 +71,19 @@ int func (double t,
 
 int main()
 {
+    // ask user for alpha, delta and gamma values
+    double alpha, gamma, delta;
+    cout << "Enter alpha value: ";
+    cin >> alpha;
+    cout << "Enter gamma value: ";
+    cin >> gamma;
+    cout << "Enter delta value: ";
+    cin >> delta;
 
     // output file
-    FILE * outdata = fopen ("../../data/evolution_degeneracy.dat","w"); 
+    stringstream filename;
+    filename << "../../data/evolution_degeneracy_alpha=" << alpha << ".dat";
+    FILE * outdata = fopen (filename.str().c_str(),"w"); 
     fprintf(outdata,"# time [year]  degeneracy");
 
     size_t dim = 1;
@@ -88,9 +99,9 @@ int main()
     params[5]  = X + 0.5*Y; // number of baryons per electron
     params[6]  = 0.01; // Rossland opacity [cm2/g]
     params[7]  = 1.; // Omega
-    params[8]  = 2.36; // gamma
-    params[9]  = 5.95; // delta
-    params[10] = 0.006; //alpha
+    params[8]  = gamma; // gamma
+    params[9]  = delta; // delta
+    params[10] = alpha; //alpha
     // declare ODE system
     gsl_odeiv2_system sys = {func, NULL, dim, &params};
 
