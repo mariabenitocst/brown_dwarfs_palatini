@@ -22,16 +22,6 @@ double Li2(double x)
    return li2_gsl.val;
 }
 
-// TODO check units of mu and mu_e!!
-double _b (const double psi,
-           double T,
-           double mu)
-{
-    double k_B = 1.380649e-23; // Boltzmann constant [J/K]
-    // return
-    return (-5./16.*psi*log(1+exp(-mu/k_B/T)) + 
-            15./8.*psi*psi*(pow(M_PI, 2/3.) + Li2(-exp(-1/psi))));
-}
 
 /***********************************************************************//**
  * @brief Function to be integrated
@@ -45,19 +35,20 @@ int func (double t,
   double *_params = (double *) params;
   // get parameters from params
   double M     = _params[0];
-  double T     = _params[1];
-  double b1    = _params[2];
-  double nu    = _params[3];
-  double mu_1  = _params[4];
-  double mu_e  = _params[5];
-  double kR    = _params[6];
-  double omega = _params[7];
-  double gamma = _params[8];
-  double delta = _params[9];
-  double alpha = _params[10];
+  double b1    = _params[1];
+  double nu    = _params[2];
+  double mu_1  = _params[3];
+  double mu_e  = _params[4];
+  double kR    = _params[5];
+  double omega = _params[6];
+  double gamma = _params[7];
+  double delta = _params[8];
+  double alpha = _params[9];
 
-  double b     = _b(y[0], T, mu_e);
+  double b     = (-5./16.*y[0]*log(1+exp(-1/y[0])) + 
+                  15./8.*y[0]*y[0]*(pow(M_PI, 2)/2. + Li2(-exp(-1/y[0]))));
   double a     = 2.5*mu_e/mu_1;
+
 
   double f_1 = 1.1634e-18*pow(b1, 2.856)*mu_1/(pow(kR, 1.1424)*pow(mu_e, 8./3.));
   double f_2 = pow(gamma, 0.7143)*pow(1-1.33*alpha/delta, 1.143)/omega;
@@ -88,20 +79,21 @@ int main()
 
     size_t dim = 1;
     double params[11];
-    params[0]  = 0.03; // mass [Msun]
-    params[1]  = pow(10, 3.94);
-    params[2]  = 2.;
-    params[3]  = 1.60;
-    double X   = 0.75; // mass fraction H
-    double Y   = 0.25; // mass fracion He
+    params[0] = 0.03; // mass [Msun]
+    params[1] = 2.; //b1
+    params[2] = 1.60; //nu
+    double _X = 0.75; // mass fraction H
+    double _Y = 0.25; // mass fracion He
     // mean molecual weight for He and ionized H mixture
-    params[4]  = pow((1+0.5*0.51)*X+Y/4., -1);
-    params[5]  = X + 0.5*Y; // number of baryons per electron
-    params[6]  = 0.01; // Rossland opacity [cm2/g]
-    params[7]  = 1.; // Omega
-    params[8]  = gamma; // gamma
-    params[9]  = delta; // delta
-    params[10] = alpha; //alpha
+    params[3] = pow((1+0.5*0.51)*_X+_Y/4., -1);
+    params[4] = pow(_X + 0.5*_Y, -1); // number of baryons per electron
+    params[5] = 0.01; // Rossland opacity [cm2/g]
+    params[6] = 1.; // Omega
+    params[7] = gamma; // gamma
+    params[8] = delta; // delta
+    params[9] = alpha; //alpha
+
+/*
     // declare ODE system
     gsl_odeiv2_system sys = {func, NULL, dim, &params};
 
@@ -131,10 +123,27 @@ int main()
             printf("Error: status = %d \n", status);
             break;
         }
-        printf ("%.5e %.5e \n", t, y[0]); // print psi(t=t_next)
+        //printf ("%.5e %.5e \n", t, y[0]); // print psi(t=t_next)
         fprintf(outdata,"%.5e  %.5e\n", t, y[0]);
     }
     gsl_odeiv2_driver_free(d);
+    fclose (outdata);
+*/
+
+/** Checking func */
+    //double y[1]; y[0] = 0.9;
+    //double f[1]; f[0] = 0.;
+
+    //cout << func(0, y, f, &params) << endl;
+
+    double tmin = 0.; double tmax=1.; double delta_t = 0.001;
+    double y[1]; double f[1]; f[0]=0.; double rhs;
+    for (double t_next = tmin + delta_t; t_next <= tmax; t_next += delta_t)
+    {
+        y[0] = t_next;
+        rhs = func(0, y, f, &params);
+        fprintf(outdata,"%.5e  %.5e\n", t_next, f[0]);
+    }
     fclose (outdata);
 
     // return 
