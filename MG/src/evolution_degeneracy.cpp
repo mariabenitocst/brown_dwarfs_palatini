@@ -9,6 +9,7 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv2.h>
 #include <gsl/gsl_sf_dilog.h>
+#include <vector>
 using namespace std;
 
 /***********************************************************************//**
@@ -63,28 +64,21 @@ int func (double t,
 }
 
 
-int main()
+vector<double> degeneracy(double mass,
+                          double alpha,
+                          double gamma,
+                          double delta,
+                          double tmin,
+                          double tmax,
+                          double delta_t)
 {
-    // ask user for alpha, delta and gamma values
-    double alpha, gamma, delta;
-    cout << "Enter alpha value: ";
-    cin >> alpha;
-    cout << "Enter gamma value: ";
-    cin >> gamma;
-    cout << "Enter delta value: ";
-    cin >> delta;
-
-    // output file
-    stringstream filename;
-    filename << "../../data/evolution_degeneracy_alpha=" << alpha << ".dat";
-    FILE * outdata = fopen (filename.str().c_str(),"w"); 
-    fprintf(outdata,"# time [year]  degeneracy");
-
     size_t dim = 1;
     double params[11];
-    params[0] = 0.01; // mass [Msun]
+    params[0] = mass; // mass [Msun]
+    /** Model D   */
     params[1] = 2.; //b1
     params[2] = 1.60; //nu
+    /** */
     double _X = 0.75; // mass fraction H
     double _Y = 0.25; // mass fracion He
     // mean molecual weight for He and ionized H mixture
@@ -108,14 +102,16 @@ int main()
     gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk8pd,
                                    h, eps_abs, eps_rel);
 
-    double tmin    = 1e6; // starting t value
-    double tmax    = 1e10; // final t value [year]
-    double delta_t = 1e4; // step in t [year]
+    //double tmin    = 1e6; // starting t value
+    //double tmax    = 1e10; // final t value [year]
+    //double delta_t = 1e4; // step in t [year]
 
     double t       = tmin; // initialize t
     double y[dim];
     y[0] = 1.0; // initial value psi
     int status; // status of driver function
+
+    vector<double> psi; // degeneracy
 
     for (double t_next = tmin + delta_t; t_next <= tmax; t_next += delta_t)
     {
@@ -125,29 +121,59 @@ int main()
             printf("Error: status = %d \n", status);
             break;
         }
-        //printf ("%.5e %.5e \n", t, y[0]); // print psi(t=t_next)
-        fprintf(outdata,"%.5e  %.5e\n", t, y[0]);
+        psi.push_back(y[0]);
     }
     gsl_odeiv2_driver_free(d);
-    fclose (outdata);
+
+    // return
+    return psi;
+}
 
 
-/** Checking func 
-    //double y[1]; y[0] = 0.9;
-    //double f[1]; f[0] = 0.;
+int main()
+{
+    // ask user for alpha, delta and gamma values
+    double alpha, gamma, delta;
+    cout << "Enter alpha value: ";
+    cin >> alpha;
+    cout << "Enter gamma value: ";
+    cin >> gamma;
+    cout << "Enter delta value: ";
+    cin >> delta;
 
-    //cout << func(0, y, f, &params) << endl;
+    // output file
+    stringstream filename;
+    filename << "../../data/evolution_degeneracy_alpha=" << alpha << ".dat";
+    FILE * outdata = fopen (filename.str().c_str(),"w"); 
+    fprintf(outdata,"# time [year]  degeneracy");
 
-    double tmin = 0.; double tmax=1.; double delta_t = 0.001;
-    double y[1]; double f[1]; f[0]=0.; double rhs;
+    double mass[5]; // mass [Msun]
+    mass[0] = 0.01;
+    mass[1] = 0.03;
+    mass[2] = 0.05;
+    mass[3] = 0.08;
+    mass[4] = 0.09;
+
+    double tmin    = 1e6; // starting t value
+    double tmax    = 1e10; // final t value [year]
+    double delta_t = 1e4; // step in t [year]
+
+    vector<double> psi[5];
+
+    for (int i=0; i<=4; i++)
+    {
+        psi[i] = degeneracy(mass[i], alpha, gamma, delta, tmin, tmax, delta_t);
+    }
+
+    int j = 0;
     for (double t_next = tmin + delta_t; t_next <= tmax; t_next += delta_t)
     {
-        y[0] = t_next;
-        rhs = func(0, y, f, &params);
-        fprintf(outdata,"%.5e  %.5e\n", t_next, f[0]);
+        fprintf(outdata,"%.5e %.5e %.5e %.5e %.5e %.5e\n", t_next, psi[0][j],
+                        psi[1][j], psi[2][j], psi[3][j], psi[4][j]);
+        j += 1;
     }
     fclose (outdata);
-*/
+
     // return 
     return 0;
 }
