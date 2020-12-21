@@ -53,7 +53,10 @@ int func (double t,
   double f_1 = 1.1634e-18*pow(b1, 2.856)*mu_1/(pow(kR, 1.1424)*pow(mu_e, 8./3.));
   double f_2 = pow(gamma, 0.7143)*pow(1-1.33*alpha/delta, 1.143)/omega;
 
-  f[0] = -f_1*f_2*pow(M, -1.094)*pow(y[0], 2.856*nu)*pow(1+b+a*y[0], 1.715);
+  double change_to_year = 3.1536e7; // seconds/year
+
+  f[0] = -f_1*change_to_year*f_2*pow(M, -1.094)*
+         pow(y[0], 2.856*nu)*pow(1+b+a*y[0], 1.715);
 
   // return
   return GSL_SUCCESS;
@@ -93,7 +96,6 @@ int main()
     params[8] = delta; // delta
     params[9] = alpha; //alpha
 
-/*
     // declare ODE system
     gsl_odeiv2_system sys = {func, NULL, dim, &params};
 
@@ -106,9 +108,9 @@ int main()
     gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk8pd,
                                    h, eps_abs, eps_rel);
 
-    double tmin    = 0.; // starting t value
-    double tmax    = 1.e8; // final t value [year]
-    double delta_t = 100.; // step in t [year]
+    double tmin    = 1e8; // starting t value
+    double tmax    = 1.e12; // final t value [year]
+    double delta_t = 1e6; // step in t [year]
 
     double t       = tmin; // initialize t
     double y[dim];
@@ -128,9 +130,9 @@ int main()
     }
     gsl_odeiv2_driver_free(d);
     fclose (outdata);
-*/
 
-/** Checking func */
+
+/** Checking func 
     //double y[1]; y[0] = 0.9;
     //double f[1]; f[0] = 0.;
 
@@ -145,7 +147,7 @@ int main()
         fprintf(outdata,"%.5e  %.5e\n", t_next, f[0]);
     }
     fclose (outdata);
-
+*/
     // return 
     return 0;
 }
