@@ -53,7 +53,7 @@ int func (double t,
   double f_1 = 1.1634e-18*pow(b1, 2.856)*mu_1/(pow(kR, 1.1424)*pow(mu_e, 8./3.));
   double f_2 = pow(gamma, 0.7143)*pow(1-1.33*alpha/delta, 1.143)/omega;
 
-  f[0] = f_1*f_2*pow(M, -1.094)*pow(y[0], 2.856*nu)*pow(1+b+a*y[0], 1.715);
+  f[0] = -f_1*f_2*pow(M, -1.094)*pow(y[0], 2.856*nu)*pow(1+b+a*y[0], 1.715);
 
   // return
   return GSL_SUCCESS;
