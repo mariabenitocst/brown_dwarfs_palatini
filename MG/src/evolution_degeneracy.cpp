@@ -82,7 +82,7 @@ int main()
 
     size_t dim = 1;
     double params[11];
-    params[0] = 0.03; // mass [Msun]
+    params[0] = 0.01; // mass [Msun]
     params[1] = 2.; //b1
     params[2] = 1.60; //nu
     double _X = 0.75; // mass fraction H
@@ -108,9 +108,9 @@ int main()
     gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk8pd,
                                    h, eps_abs, eps_rel);
 
-    double tmin    = 1e8; // starting t value
-    double tmax    = 1.e12; // final t value [year]
-    double delta_t = 1e6; // step in t [year]
+    double tmin    = 1e6; // starting t value
+    double tmax    = 1e10; // final t value [year]
+    double delta_t = 1e4; // step in t [year]
 
     double t       = tmin; // initialize t
     double y[dim];
