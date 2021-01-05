@@ -159,8 +159,8 @@ int main()
     for (double t_next = tmin + delta_t; t_next <= tmax; t_next += delta_t)
     {
         t_final = t_next;
-	psi_final = psi[j];
-	j += 1;
+        psi_final = psi[j];
+        j += 1;
     }
     cout << t_final << "  " << psi_final << endl;
 

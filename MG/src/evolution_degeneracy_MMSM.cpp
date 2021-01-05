@@ -35,21 +35,23 @@ int func (double t,
   (void)(t); // avoid unused parameter warning
   double *_params = (double *) params;
   // get parameters from params
-  double M     = _params[0];
-  double b1    = _params[1];
-  double nu    = _params[2];
-  double mu_1  = _params[3];
-  double mu_e  = _params[4];
-  double kR    = _params[5];
-  double omega = _params[6];
-  double gamma = _params[7];
-  double delta = _params[8];
-  double alpha = _params[9];
+  double b1    = _params[0];
+  double nu    = _params[1];
+  double mu_1  = _params[2];
+  double mu_e  = _params[3];
+  double kR    = _params[4];
+  double omega = _params[5];
+  double gamma = _params[6];
+  double delta = _params[7];
+  double alpha = _params[8];
 
   double b     = (-5./16.*y[0]*log(1+exp(-1/y[0])) + 
                   15./8.*y[0]*y[0]*(pow(M_PI, 2)/2. + Li2(-exp(-1/y[0]))));
   double a     = 2.5*mu_e/mu_1;
 
+  double F = 0.0141*pow(b1, 0.266)*pow(kR, -0.106)*pow(y[0], 0.266*nu-0.59)*
+                    pow(1+b+a*y[0], 1.506);
+  double M = F*pow(gamma, 1.506)*pow(delta, -0.512)*pow(1-1.33*alpha/delta, 0.106);
 
   double f_1 = 1.1634e-18*pow(b1, 2.856)*mu_1/(pow(kR, 1.1424)*pow(mu_e, 8./3.));
   double f_2 = pow(gamma, 0.7143)*pow(1-1.33*alpha/delta, 1.143)/omega;
@@ -64,8 +66,7 @@ int func (double t,
 }
 
 
-vector<double> degeneracy(double mass,
-                          double alpha,
+vector<double> degeneracy(double alpha,
                           double gamma,
                           double delta,
                           double tmin,
@@ -73,22 +74,21 @@ vector<double> degeneracy(double mass,
                           double delta_t)
 {
     size_t dim = 1;
-    double params[11];
-    params[0] = mass; // mass [Msun]
+    double params[9];
     /** Model D   */
-    params[1] = 2.; //b1
-    params[2] = 1.60; //nu
+    params[0] = 2.; //b1
+    params[1] = 1.60; //nu
     /** */
     double _X = 0.75; // mass fraction H
     double _Y = 0.25; // mass fracion He
     // mean molecual weight for He and ionized H mixture
-    params[3] = pow((1+0.5*0.51)*_X+_Y/4., -1);
-    params[4] = pow(_X + 0.5*_Y, -1); // number of baryons per electron
-    params[5] = 0.01; // Rossland opacity [cm2/g]
-    params[6] = 1.; // Omega
-    params[7] = gamma; // gamma
-    params[8] = delta; // delta
-    params[9] = alpha; //alpha
+    params[2] = pow((1+0.5*0.51)*_X+_Y/4., -1);
+    params[3] = pow(_X + 0.5*_Y, -1); // number of baryons per electron
+    params[4] = 0.01; // Rossland opacity [cm2/g]
+    params[5] = 1.; // Omega
+    params[6] = gamma; // gamma
+    params[7] = delta; // delta
+    params[8] = alpha; //alpha
 
     // declare ODE system
     gsl_odeiv2_system sys = {func, NULL, dim, &params};
@@ -133,36 +133,35 @@ vector<double> degeneracy(double mass,
 int main()
 {
     // ask user for alpha, delta and gamma values
-    double alpha, gamma, delta, mass, tmax;
+    double alpha, gamma, delta;
     cout << "Enter alpha value: ";
     cin >> alpha;
     cout << "Enter gamma value: ";
     cin >> gamma;
     cout << "Enter delta value: ";
     cin >> delta;
-    cout << "Enter Minimum Main Sequence mass: ";
-    cin >> mass;
-    cout << "Enter maximum time in yr (i.e. time in which we are interested): ";
-    cin >> tmax;
 
     double tmin    = 1e7; // starting t value
-    double delta_t = 1e3; // step in t [year]
+    double tmax    = 1e10; // ending t value
+    double delta_t = 1e4; // step in t [year]
 
     vector<double> psi;
 
-    psi = degeneracy(mass, alpha, gamma, delta, tmin, tmax, delta_t);
+    psi = degeneracy(alpha, gamma, delta, tmin, tmax, delta_t);
 
+    // output file
+    stringstream filename;
+    filename << "../../data/evolution_degeneracy_MMSM_alpha=" << alpha << ".dat";
+    FILE * outdata = fopen (filename.str().c_str(),"w"); 
+    fprintf(outdata,"# time [year]  degeneracy");
 
-    double t_final   = 0.;
-    double psi_final = 0.;
     int j = 0;
     for (double t_next = tmin + delta_t; t_next <= tmax; t_next += delta_t)
     {
-        t_final = t_next;
-	psi_final = psi[j];
-	j += 1;
+        fprintf(outdata,"%.5e %.5e\n", t_next, psi[j]);
+        j += 1;
     }
-    cout << t_final << "  " << psi_final << endl;
+    fclose (outdata);
 
     // return 
     return 0;
