@@ -143,7 +143,7 @@ int main()
 
     double tmin    = 1e7; // starting t value
     double tmax    = 1e10; // ending t value
-    double delta_t = 1e4; // step in t [year]
+    double delta_t = 1e5; // step in t [year]
 
     vector<double> psi;
 
