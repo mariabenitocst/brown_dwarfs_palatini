@@ -19,7 +19,7 @@ int func (double xi,
 {
   double alpha = *(double *)params;
 
-  double epsilon = 0.001;
+  double epsilon = 1e-5;
   xi = xi + epsilon;
 
   double factor = 1+2*alpha*pow(y[0], 1.5);
