@@ -2,7 +2,7 @@
 
 Code for calculating the evolution of the degeneracy parameter with respect to time in quadratic Palatini gravity (Starobinsky model).
 
-The time evolution of the degeneracy parameter is given by equation (44) in Benito & Wojnar 2021. This ordinary differential equation is numerically solved using C++ and the plotting of the corresponding results is done with python3.
+The time evolution of the degeneracy parameter is given by equation (44) in [Benito & Wojnar 2021](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.103.064032). This ordinary differential equation is numerically solved using C++ and the plotting of the corresponding results is done with python3.
 
 
 ### Setup
