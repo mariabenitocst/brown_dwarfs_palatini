@@ -145,7 +145,7 @@ int main()
     stringstream filename;
     filename << "../../data/evolution_degeneracy_alpha=" << alpha << ".dat";
     FILE * outdata = fopen (filename.str().c_str(),"w"); 
-    fprintf(outdata,"# time [year]  degeneracy");
+    fprintf(outdata,"# time [year]  degeneracy\n");
 
     double mass[5]; // mass [Msun]
     mass[0] = 0.01;
